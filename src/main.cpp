@@ -3,12 +3,7 @@
 // * Builds with the *standard* Arduino‑MBed core.
 // * Streams ADXL345 data exactly like navaismo/adxl345spi – header
 //   "time,x,y,z" followed by CSV lines, default 250 Hz.
-// * Uses an mbed::SPI instance on GPIO 10‑12 (the Fly‑board tracks).
-//
-//   CS  = GPIO 9   (chip‑select)
-//   SCK = GPIO 10  (SPI1 SCK)
-//   MOSI= GPIO 11  (SPI1 TX)
-//   MISO= GPIO 12  (SPI1 RX)
+// * Uses an mbed::SPI instance.
 //
 // =============================================================
 
@@ -23,15 +18,25 @@
 #define REG_DATA_FORMAT 0x31
 #define REG_DATAX0      0x32
 
-/* =====================  Board-specific pins  ======================= */
-#ifndef CS_PIN              // set via -DCS_PIN=… in platformio.ini
-#define CS_PIN 9            // default = Fly-ADXL345-USB
+/* ───── Board-specific pins (overridable via build_flags) ─────────── */
+#ifndef CS_PIN
+#  define CS_PIN 9          // legacy default
 #endif
-/* mbed SPI on GPIO11(MOSI) / 12(MISO) / 10(SCK) */
+#ifndef SCK_PIN
+#  define SCK_PIN 10
+#endif
+#ifndef MOSI_PIN
+#  define MOSI_PIN 11
+#endif
+#ifndef MISO_PIN
+#  define MISO_PIN 12
+#endif
+
+/* ───── SPI instance on the chosen GPIOs ──────────────────────────── */
 static mbed::SPI spiPort(
-    digitalPinToPinName(11),   // MOSI
-    digitalPinToPinName(12),   // MISO
-    digitalPinToPinName(10));  // SCK
+    digitalPinToPinName(MOSI_PIN),
+    digitalPinToPinName(MISO_PIN),
+    digitalPinToPinName(SCK_PIN));
 
 constexpr uint32_t SPI_SPEED = 2'000'000;   // 2 MHz
 
