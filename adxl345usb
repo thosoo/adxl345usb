@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+"""
+adxl345usb – Fly-ADXL345-USB wrapper (Pinput-Shaping-compatible)
+
+Exit codes
+==========    0  OK
+              1  bad command-line
+              2  could not open serial port
+              3  cannot open save-file
+              4  runtime/parsing error
+"""
+import argparse, os, select, sys, termios, tty, time
+from textwrap import dedent
+
+try:
+    import serial
+    from serial import SerialException
+except ModuleNotFoundError:
+    sys.stderr.write("ERROR: pyserial not installed.  Try:  sudo pip3 install pyserial\n")
+    sys.exit(2)
+
+# ─────────── helper ─────────────────────────────────────────────────
+def die(msg: str, code: int):
+    sys.stderr.write(f"ERROR: {msg}\n")
+    sys.exit(code)
+
+# ─────────── args ──────────────────────────────────────────────────
+ap = argparse.ArgumentParser(
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    description="Stream ADXL345 data from an RP2040 board.",
+    epilog=dedent("""\
+        Behaviour (matches navaismo/adxl345spi):
+          * without -s  → human-readable rows on STDOUT
+          * with    -s  → CSV written to FILE, STDOUT gets only the banner
+          * stop      by:  • timeout (-t)  • or sending 'q'+'Enter' to stdin
+    """))
+
+ap.add_argument("-p", "--port", default="/dev/ttyACM1", help="serial device")
+ap.add_argument("-f", "--freq", type=int, default=250, help="sampling rate 1-3200 Hz")
+ap.add_argument("-t", "--time", type=int, default=0,   help="capture seconds (0 = until Q)")
+ap.add_argument("-s", "--save", metavar="FILE", help="CSV output file")
+args = ap.parse_args()
+
+if not (1 <= args.freq <= 3200):
+    die("frequency must be 1–3200 Hz", 1)
+
+# ─────────── open serial ────────────────────────────────────────────
+try:
+    ser = serial.Serial(args.port, 2_000_000, timeout=0.1)
+except SerialException as e:
+    die(f"cannot open {args.port} – {e}", 2)
+
+ser.reset_input_buffer()
+ser.write(f"F={args.freq}\n".encode())         # firmware resends header
+
+# ─────────── banner for plugin ──────────────────────────────────────
+print("Press Q to stop", flush=True)
+
+# ─────────── pick output sink ───────────────────────────────────────
+if args.save:
+    try:
+        csv = open(args.save, "w", buffering=1)
+    except OSError as e:
+        die(f"cannot open '{args.save}' for writing – {e}", 3)
+    csv.write("time,x,y,z\n")
+    buf_t, buf_x, buf_y, buf_z = [], [], [], []
+    FLUSH_EVERY = 1000
+else:
+    csv = None
+
+# ─────────── raw-mode stdin to catch single keys ────────────────────
+fd_stdin = sys.stdin.fileno()
+old_attr  = termios.tcgetattr(fd_stdin)
+tty.setcbreak(fd_stdin)
+
+def flush_buffer():
+    """write buffered rows to file (CSV mode)"""
+    for t, x, y, z in zip(buf_t, buf_x, buf_y, buf_z):
+        csv.write(f"{t:.6f},{x:.6f},{y:.6f},{z:.6f}\n")
+    buf_t.clear(); buf_x.clear(); buf_y.clear(); buf_z.clear()
+    csv.flush()
+
+try:
+    # ───── skip the firmware header line ────────────────────────────
+    while True:
+        hdr = ser.readline()
+        if hdr.startswith(b"time,"):
+            break
+
+    t_start   = time.time()
+    t_end     = t_start + args.time if args.time else None
+    samples   = 0
+    bad_lines = 0
+
+    while True:
+        # ---- termination conditions --------------------------------
+        if select.select([fd_stdin], [], [], 0)[0]:
+            if sys.stdin.read(1).lower() == "q":
+                break
+        if t_end and time.time() >= t_end:
+            break
+
+        # ---- read one CSV line -------------------------------------
+        line = ser.readline()
+        if not line:
+            continue
+        try:
+            t_s, x_s, y_s, z_s = line.decode().strip().split(',')
+            t_f = float(t_s); x_f = float(x_s); y_f = float(y_s); z_f = float(z_s)
+        except ValueError:
+            bad_lines += 1
+            if bad_lines > 10:
+                die("too many malformed lines from firmware", 4)
+            continue
+
+        if csv:
+            buf_t.append(t_f); buf_x.append(x_f); buf_y.append(y_f); buf_z.append(z_f)
+            if len(buf_t) >= FLUSH_EVERY:
+                flush_buffer()
+        else:
+            # human-readable like original C tool
+            print(f"time = {t_f:.3f}, x = {x_f:.3f}, y = {y_f:.3f}, z = {z_f:.3f}")
+        samples += 1
+
+finally:
+    # restore TTY + close resources
+    termios.tcsetattr(fd_stdin, termios.TCSADRAIN, old_attr)
+    ser.close()
+    if csv:
+        flush_buffer()
+        csv.close()
+
+# ─────────── summary line (only when not csv-save) ──────────────────
+elapsed = time.time() - t_start
+if not csv:
+    sys.stderr.write(f"Captured {samples} samples in {elapsed:.2f} s "
+                     f"({samples/elapsed:.1f} Hz)\n")
+sys.exit(0)
