@@ -1,0 +1,51 @@
+name: Build RP2040 firmware
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:     # allow manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1) Grab code ----------------------------------------------------------------
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 2) Install Python & PlatformIO ----------------------------------------------
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install PlatformIO Core
+      run: |
+        python -m pip install --upgrade pip
+        pip install --no-cache-dir platformio
+
+    # 3) Cache PIO packages/platforms --------------------------------------------
+    - name: Cache PlatformIO
+      uses: actions/cache@v4
+      with:
+        path: ~/.platformio
+        key: pio-${{ runner.os }}-${{ hashFiles('platformio.ini') }}
+        restore-keys: |
+          pio-${{ runner.os }}-
+
+    # 4) Build all environments ---------------------------------------------------
+    - name: Build (pio run)
+      run: pio run
+
+    # 5) Collect artifacts --------------------------------------------------------
+    - name: Upload compiled firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware
+        path: |
+          .pio/build/*/*.uf2
+          .pio/build/*/*.bin
+          .pio/build/*/*.hex
+        if-no-files-found: error
