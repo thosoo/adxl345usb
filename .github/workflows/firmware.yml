@@ -1,21 +1,30 @@
-name: Build RP2040 firmware
+name: Build RP2040 firmware for all boards
 
+# ─── When to run ─────────────────────────────────────────────────────
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   pull_request:
-  workflow_dispatch:     # allow manual trigger
+  workflow_dispatch:            # manual trigger in the Actions tab
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    # 1️⃣  Build each PLATFORMIO environment in parallel
+    strategy:
+      matrix:
+        env_name:
+          - fly_adxl345_usb
+          - fysetc_pis
+          - btt_adxl345
+
     steps:
-    # 1) Grab code ----------------------------------------------------------------
+    # ── Checkout code ────────────────────────────────────────────────
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 2) Install Python & PlatformIO ----------------------------------------------
+    # ── Install Python & PlatformIO Core ─────────────────────────────
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -26,26 +35,25 @@ jobs:
         python -m pip install --upgrade pip
         pip install --no-cache-dir platformio
 
-    # 3) Cache PIO packages/platforms --------------------------------------------
-    - name: Cache PlatformIO
+    # ── Cache ~/.platformio to speed up builds ───────────────────────
+    - name: Cache PlatformIO packages
       uses: actions/cache@v4
       with:
         path: ~/.platformio
         key: pio-${{ runner.os }}-${{ hashFiles('platformio.ini') }}
-        restore-keys: |
-          pio-${{ runner.os }}-
+        restore-keys: pio-${{ runner.os }}-
 
-    # 4) Build all environments ---------------------------------------------------
-    - name: Build (pio run)
-      run: pio run
+    # ── Build the selected environment ───────────────────────────────
+    - name: Build ${{ matrix.env_name }}
+      run: pio run -e ${{ matrix.env_name }}
 
-    # 5) Collect artifacts --------------------------------------------------------
-    - name: Upload compiled firmware
+    # ── Upload firmware artifact for this board ──────────────────────
+    - name: Upload ${{ matrix.env_name }} firmware
       uses: actions/upload-artifact@v4
       with:
-        name: firmware
+        name: firmware-${{ matrix.env_name }}
         path: |
-          .pio/build/*/*.uf2
-          .pio/build/*/*.bin
-          .pio/build/*/*.hex
+          .pio/build/${{ matrix.env_name }}/*.uf2
+          .pio/build/${{ matrix.env_name }}/*.bin
+          .pio/build/${{ matrix.env_name }}/*.hex
         if-no-files-found: error
