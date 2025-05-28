@@ -23,9 +23,10 @@
 #define REG_DATA_FORMAT 0x31
 #define REG_DATAX0      0x32
 
-/* ---------------- Hardware pins ---------------------- */
-#define CS_PIN 9       // chip‑select (Fly‑ADXL345‑USB default)
-
+/* =====================  Board-specific pins  ======================= */
+#ifndef CS_PIN              // set via -DCS_PIN=… in platformio.ini
+#define CS_PIN 9            // default = Fly-ADXL345-USB
+#endif
 /* mbed SPI on GPIO11(MOSI) / 12(MISO) / 10(SCK) */
 static mbed::SPI spiPort(
     digitalPinToPinName(11),   // MOSI
