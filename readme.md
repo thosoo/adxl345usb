@@ -2,23 +2,22 @@
 
 ## Overview
 
-This project provides an installation script and firmware for using a Fly-ADXL345-USB (RP2040) sensor module with [OctoPrint-Pinput\_Shaping](https://github.com/navaismo/Octoprint-Pinput_Shaping) by navaismo.
+This project provides an installation script and firmware for using a RP2040 based ADXL345 sensor module with [OctoPrint-Pinput\_Shaping](https://github.com/navaismo/Octoprint-Pinput_Shaping) by navaismo.
 
 ## Features
 
-* Supports ADXL345-USB via RP2040 (Fly-ADXL345-USB) for resonance testing.
+* Supports ADXL345 via RP2040 (such as Mellow Fly-ADXL345-USB, BTT ADXL345 and FYSETC PIS) for resonance testing.
 * Compatible with OctoPrint’s Pinput Shaping plugin without any code modification.
 * The installation script automatically sets up the required wrapper and configures permissions.
 
 ## Requirements
 
 * OctoPrint installed (preferably in a virtual environment).
-* A Fly-ADXL345-USB or any compatible RP2040 module with an ADXL345 sensor.
 * Python (in OctoPrint’s venv) with PySerial.
 
 ## Installation
 
-1. Ensure you have the ADXL345USB firmware flashed on your Fly-ADXL345-USB (RP2040).
+1. Ensure you have the ADXL345USB firmware flashed on your sensor module.
 2. Copy both the `adxl345usb` script and the `install.sh` script to a directory.
 3. Run the installation script as `su`:
 
