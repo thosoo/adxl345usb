@@ -1,0 +1,45 @@
+name: CI – test installer
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:           # manual trigger
+
+jobs:
+  installer:
+    runs-on: ubuntu-latest     # GitHub runner has password-less sudo
+
+    steps:
+    # ── 1. Get the code ─────────────────────────────────────────────
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # ── 2. Ensure both files are executable ─────────────────────────
+    - name: Make installer & wrapper executable
+      run: |
+        chmod +x install.sh
+        chmod +x adxl345usb
+
+    # (Optional) create a dummy wrapper if the file is generated later
+    # - run: echo -e '#!/usr/bin/env bash\necho ok' > adxl345usb && chmod +x adxl345usb
+
+    # ── 3. Run the installer with sudo ──────────────────────────────
+    - name: Run install.sh
+      run: sudo ./install.sh
+
+    # ── 4. Verify the result ────────────────────────────────────────
+    - name: Verify wrapper installed
+      run: |
+        if [[ ! -x /usr/local/bin/adxl345spi ]]; then
+          echo "Wrapper not installed!" >&2
+          exit 1
+        fi
+        # Call the wrapper; ignore its exit code if it expects a device
+        /usr/local/bin/adxl345spi || true
+
+    # ── 5. Cleanup sudoers entry so subsequent jobs stay clean -------
+    - name: Remove sudoers file (cleanup)
+      if: always()
+      run: |
+        sudo rm -f /etc/sudoers.d/octoprint_adxl
