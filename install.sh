@@ -2,30 +2,33 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Installing ADXL345USB Tool (wrapper)
-echo -e "\n[ $(date '+%Y-%m-%d %H:%M:%S') ] - Installing ADXL345USB Tool..."
+# ─────────────────── Helper ────────────────────────────────
+die() { echo "ERROR: $*" >&2; exit 1; }
+timestamp() { date '+%F %T'; }
+log() { echo -e "[ $(timestamp) ]  $*"; }
 
-# Install the wrapper directly from the same directory (must be in the same folder as this script)
-SCRIPT_DIR=$(dirname "$(realpath "$0")")
+[[ $EUID -eq 0 ]] || die "please run as root (sudo bash install.sh)"
 
-# Ensure the wrapper exists
-if [[ ! -f "$SCRIPT_DIR/adxl345usb" ]]; then
-    echo "Error: adxl345usb wrapper not found in the installation directory."
-    exit 1
-fi
+# ─────────────────── Locate wrapper ────────────────────────
+#   Works on systems without GNU realpath (BusyBox, Alpine…)
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+WRAPPER_SRC="$SCRIPT_DIR/adxl345usb"
+WRAPPER_DST="/usr/local/bin/adxl345spi"   # keep old name for the plugin
 
-# Create the target directory if it doesn't exist
-mkdir -p /usr/local/bin
+[[ -f $WRAPPER_SRC ]] || die "wrapper '$WRAPPER_SRC' not found"
 
-# Install the wrapper
-install -m 755 "$SCRIPT_DIR/adxl345usb" /usr/local/bin/adxl345spi
+# ─────────────────── Install ───────────────────────────────
+log "Installing ADXL345USB wrapper → ${WRAPPER_DST}"
+install -m 755 "$WRAPPER_SRC" "$WRAPPER_DST"
 
-# Configure sudoers for OctoPrint
+# ─────────────────── Sudoers entry (OctoPrint user) ────────
 SUDOERS_FILE="/etc/sudoers.d/octoprint_adxl"
-rm -f "$SUDOERS_FILE"
-echo "octoprint ALL=(ALL) NOPASSWD: /usr/local/bin/adxl345spi" > "$SUDOERS_FILE"
+log "Configuring sudoers → $SUDOERS_FILE"
+
+cat <<EOF | tee "$SUDOERS_FILE" >/dev/null
+octoprint ALL=(ALL) NOPASSWD: ${WRAPPER_DST}
+EOF
 chmod 440 "$SUDOERS_FILE"
 chown root:root "$SUDOERS_FILE"
 
-# Final message
-echo -e "\n✔ ADXL345USB Tool installed successfully!"
+log "✔ ADXL345USB Tool installed successfully!"
