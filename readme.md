@@ -34,7 +34,7 @@ This project provides an installation script and firmware for using a RP2040 bas
 
 ## Firmware Configuration
 
-The firmware running on the RP2040 should be the `adxl345usb` firmware provided in this project. It outputs CSV-formatted accelerometer data directly over USB (same format as `adxl345spi`).
+The firmware running on the RP2040 should be the `adxl345usb` firmware provided in this project. toThe firmware can be either compiled using VS Code and platformio or downloaded from the GitHub action tab. It outputs CSV-formatted accelerometer data directly over USB (same format as `adxl345spi`).
 
 ## Troubleshooting
 
