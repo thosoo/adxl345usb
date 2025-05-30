@@ -5,16 +5,12 @@ from sim_adxl import start as start_sim
 WRAPPER = Path(__file__).parent.parent / "adxl345usb"
 
 def run_wrapper(slave_path, *extra):
-    """Launch the wrapper, capture stdout, run for 0.1 s, then send 'q'."""
-    cp = subprocess.Popen(
-        [WRAPPER, "-p", slave_path, "-f", "250", *extra],
-        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        text=True
+    """Run wrapper, capture output, return (code, out, err)."""
+    cp = subprocess.run(
+        [WRAPPER, "-p", slave_path, "-f", "250", "-t", "0.2", *extra],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=2
     )
-    time.sleep(0.10)
-    cp.stdin.write("q\n"); cp.stdin.flush()
-    out, err = cp.communicate(timeout=2)
-    return cp.returncode, out, err
+    return cp.returncode, cp.stdout, cp.stderr
 
 def test_stream_and_quit():
     pty_path = start_sim()
@@ -28,7 +24,7 @@ def test_stream_and_quit():
 def test_csv_file_mode(tmp_path):
     pty_path = start_sim()
     csv_file = tmp_path / "cap.csv"
-    code, out, err = run_wrapper(pty_path, "-s", str(csv_file), "-t", "1")
+    code, out, err = run_wrapper(pty_path, "-s", str(csv_file))
     assert code == 0
     assert csv_file.exists() and csv_file.stat().st_size > 0
     # stdout should *only* contain the banner
