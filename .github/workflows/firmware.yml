@@ -18,6 +18,7 @@ jobs:
           - fly_adxl345_usb
           - fysetc_pis
           - btt_adxl345
+          - kusba_v2
 
     steps:
     # ── Checkout code ────────────────────────────────────────────────
