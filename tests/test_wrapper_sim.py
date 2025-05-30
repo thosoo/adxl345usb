@@ -7,7 +7,7 @@ WRAPPER = Path(__file__).parent.parent / "adxl345usb"
 def run_wrapper(slave_path, *extra):
     """Launch the wrapper, capture stdout, run for 0.1 s, then send 'q'."""
     cp = subprocess.Popen(
-        [WRAPPER, "-p", slave_path, "-f", "250", "-t", "10", *extra],
+        [WRAPPER, "-p", slave_path, "-f", "250", *extra],
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         text=True
     )
