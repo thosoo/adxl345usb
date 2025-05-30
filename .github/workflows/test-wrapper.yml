@@ -31,6 +31,4 @@ jobs:
 
     # 5. Run unit tests
     - name: Run pytest
-      env:
-            ADXLUSB_BAUD: 115200
       run: pytest -q
