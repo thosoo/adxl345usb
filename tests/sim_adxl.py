@@ -30,6 +30,6 @@ def start():
     """
     master, slave = pty.openpty()
     slave_path = os.ttyname(slave)
-    th = threading.Thread(target=_writer, args=(master,), daemon=True)
-    th.start()
+    os.close(slave)                      # ← release the slave F-descriptor
+    threading.Thread(target=_writer, args=(master,), daemon=True).start()
     return slave_path
