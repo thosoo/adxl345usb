@@ -5,10 +5,11 @@ from sim_adxl import start as start_sim
 WRAPPER = Path(__file__).parent.parent / "adxl345usb"
 
 def run_wrapper(slave_path, *extra):
-    """Run wrapper, capture output, return (code, out, err)."""
+    env = os.environ | {"ADXLUSB_BAUD": "115200"}
     cp = subprocess.run(
-        [WRAPPER, "-p", slave_path, "-f", "250", "-t", "0.2", *extra],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=2
+        [WRAPPER, "-p", slave_path, "-t", "0.2", *extra],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        text=True, timeout=2, env=env
     )
     return cp.returncode, cp.stdout, cp.stderr
 

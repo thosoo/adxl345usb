@@ -46,7 +46,8 @@ if not (1 <= args.freq <= 3200):
 
 # ─────────── open serial ────────────────────────────────────────────
 try:
-    ser = serial.Serial(args.port, 2_000_000, timeout=0.1)
+    baud = int(os.getenv("ADXLUSB_BAUD", "2000000"))
+    ser  = serial.Serial(args.port, baud, timeout=0.1)
 except SerialException as e:
     die(f"cannot open {args.port} – {e}", 2)
 
