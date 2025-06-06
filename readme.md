@@ -6,7 +6,7 @@ This project provides an installation script and firmware for using a RP2040 bas
 
 ## Features
 
-* Supports ADXL345 via RP2040 (such as Mellow Fly-ADXL345-USB, BTT ADXL345 and FYSETC PIS) for resonance testing.
+* Supports ADXL345 via RP2040 boards for resonance testing. Supported boards include Fly ADXL345-USB (Mellow), BTT ADXL345, FYSETC Portable Input-Shaper (PIS) and KUSBA v2.
 * Compatible with OctoPrint’s Pinput Shaping plugin without any code modification.
 * The installation script automatically sets up the required wrapper and configures permissions.
 
@@ -34,7 +34,7 @@ This project provides an installation script and firmware for using a RP2040 bas
 
 ## Firmware Configuration
 
-The firmware running on the RP2040 should be the `adxl345usb` firmware provided in this project. toThe firmware can be either compiled using VS Code and platformio or downloaded from the GitHub action tab. It outputs CSV-formatted accelerometer data directly over USB (same format as `adxl345spi`).
+The firmware running on the RP2040 should be the `adxl345usb` firmware provided in this project. The firmware can be either compiled using VS Code and PlatformIO or downloaded from the GitHub action tab. It outputs CSV-formatted accelerometer data directly over USB (same format as `adxl345spi`).
 
 ## Troubleshooting
 
