@@ -6,7 +6,7 @@ This project provides an installation script and firmware for using a RP2040 bas
 
 ## Features
 
-* Supports ADXL345 via RP2040 boards for resonance testing. Supported boards include Fly ADXL345-USB (Mellow), BTT ADXL345, FYSETC Portable Input-Shaper (PIS) and KUSBA v2.
+* Supports ADXL345 via RP2040 boards for resonance testing. Supported boards include Fly ADXL345-USB (Mellow), BTT ADXL345, FYSETC Portable Input-Shaper (PIS), KUSBA v2 and generic RP2040 boards (SPI0 or SPI1).
 * Compatible with OctoPrint’s Pinput Shaping plugin without any code modification.
 * The installation script automatically sets up the required wrapper and configures permissions.
 
