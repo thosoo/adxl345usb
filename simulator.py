@@ -19,6 +19,8 @@ import time
 parser = argparse.ArgumentParser(description="Run a simulated ADXL345USB device")
 parser.add_argument("-f", "--freq", type=int, default=250,
                     help="initial sample frequency (Hz)")
+parser.add_argument("--dual", action="store_true",
+                    help="output data for two sensors like DUAL_SPI firmware")
 args = parser.parse_args()
 
 master_fd, slave_fd = pty.openpty()
@@ -59,18 +61,32 @@ try:
                             period = 1.0 / freq
                             t0 = time.time()
                             next_sample = t0 + period
-                            os.write(master_fd, b"time,x,y,z\n")
+                            if args.dual:
+                                os.write(master_fd, b"time,x0,y0,z0,x1,y1,z1\n")
+                            else:
+                                os.write(master_fd, b"time,x,y,z\n")
                     except ValueError:
                         pass
 
         now = time.time()
         if now >= next_sample:
             t = now - t0
-            x = random.uniform(-1.0, 1.0)
-            y = random.uniform(-1.0, 1.0)
-            z = random.uniform(-1.0, 1.0)
-            line = f"{t:.6f},{x:.6f},{y:.6f},{z:.6f}\n".encode()
-            os.write(master_fd, line)
+            if args.dual:
+                x0 = random.uniform(-1.0, 1.0)
+                y0 = random.uniform(-1.0, 1.0)
+                z0 = random.uniform(-1.0, 1.0)
+                x1 = random.uniform(-1.0, 1.0)
+                y1 = random.uniform(-1.0, 1.0)
+                z1 = random.uniform(-1.0, 1.0)
+                line = (f"{t:.6f},{x0:.6f},{y0:.6f},{z0:.6f},"
+                        f"{x1:.6f},{y1:.6f},{z1:.6f}\n").encode()
+                os.write(master_fd, line)
+            else:
+                x = random.uniform(-1.0, 1.0)
+                y = random.uniform(-1.0, 1.0)
+                z = random.uniform(-1.0, 1.0)
+                line = f"{t:.6f},{x:.6f},{y:.6f},{z:.6f}\n".encode()
+                os.write(master_fd, line)
             next_sample += period
 finally:
     os.close(master_fd)

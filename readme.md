@@ -36,7 +36,7 @@ See the [docs](docs/) directory for detailed guides on setup, usage, development
 
 ## Firmware Configuration
 
-The firmware running on the RP2040 should be the `adxl345usb` firmware provided in this project. The firmware can be either compiled using VS Code and PlatformIO or downloaded from the GitHub action tab. It outputs CSV-formatted accelerometer data directly over USB (same format as `adxl345spi`).
+The firmware running on the RP2040 should be the `adxl345usb` firmware provided in this project. The firmware can be either compiled using VS Code and PlatformIO or downloaded from the GitHub action tab. It outputs CSV-formatted accelerometer data directly over USB (same format as `adxl345spi`). When compiled with `DUAL_SPI` it streams `time,x0,y0,z0,x1,y1,z1` lines which the wrapper can save using the `--dual` option.
 
 ## Simulator
 
