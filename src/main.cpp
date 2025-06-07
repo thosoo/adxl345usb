@@ -11,6 +11,8 @@
 #include <Arduino.h>
 #include <SPI.h>          // still needed for SPISettings type
 #include "mbed.h"
+#include <cstddef>
+#include <cstdint>
 
 /* ---------------- ADXL345 register map ---------------- */
 #define REG_DEVID       0x00
