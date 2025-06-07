@@ -4,7 +4,7 @@
 
 This project provides an installation script and firmware for using a RP2040 based ADXL345 sensor module with [OctoPrint-Pinput\_Shaping](https://github.com/navaismo/Octoprint-Pinput_Shaping) by navaismo.
 
-See the [docs](docs/) directory for detailed guides on setup, usage and development.
+See the [docs](docs/) directory for detailed guides on setup, usage, development and the code itself.
 
 ## Features
 
@@ -66,4 +66,4 @@ This project is open-source under the MIT License.
 
 Feel free to open issues or submit pull requests.
 
-Additional documentation can be found in the [docs](docs/) directory.
+Additional documentation (including a code overview) can be found in the [docs](docs/) directory.
