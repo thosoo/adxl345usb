@@ -4,6 +4,8 @@
 
 This project provides an installation script and firmware for using a RP2040 based ADXL345 sensor module with [OctoPrint-Pinput\_Shaping](https://github.com/navaismo/Octoprint-Pinput_Shaping) by navaismo.
 
+See the [docs](docs/) directory for detailed guides on setup, usage, development and the code itself. SPI pinouts for the supported boards are listed in [docs/spi-ports.md](docs/spi-ports.md).
+
 ## Features
 
 * Supports ADXL345 via RP2040 boards for resonance testing. Supported boards include Fly ADXL345-USB (Mellow), BTT ADXL345, FYSETC Portable Input-Shaper (PIS), KUSBA v2 and generic RP2040 boards (SPI0 or SPI1).
@@ -63,3 +65,5 @@ This project is open-source under the MIT License.
 ## Contributing
 
 Feel free to open issues or submit pull requests.
+
+Additional documentation (including a code overview) can be found in the [docs](docs/) directory.
