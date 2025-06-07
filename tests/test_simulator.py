@@ -30,3 +30,23 @@ def test_wrapper_with_simulator():
             sim.wait(timeout=5)
         except subprocess.TimeoutExpired:
             sim.kill()
+
+
+def test_wrapper_with_simulator_dual():
+    sim = subprocess.Popen([sys.executable, "simulator.py", "--dual"],
+                           stdout=subprocess.PIPE,
+                           text=True)
+    try:
+        port_line = sim.stdout.readline().strip()
+        assert port_line.startswith("Simulated serial port:"), port_line
+        port = port_line.split(":", 1)[1].strip()
+        code, out, err = run_with_pty("--dual", "-p", port, "-t", "1")
+        assert code == 0
+        assert "x0" in out
+        assert "Captured" in err
+    finally:
+        sim.terminate()
+        try:
+            sim.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            sim.kill()

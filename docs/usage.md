@@ -8,21 +8,27 @@ Run the wrapper directly to stream human‑readable output:
 ./adxl345usb -p /dev/ttyACM0
 ```
 
-Use `-s FILE` to record CSV data and `-t SEC` to stop after a given time.
+Use `-s FILE` to record CSV data and `-t SEC` to stop after a given time. When
+the firmware outputs two sensors (`time,x0,y0,z0,x1,y1,z1` header) the `--sensor`
+option selects which set of axes to write (0 or 1, default 0). Add `--dual` to
+store all six axes in the file (header `time,x0,y0,z0,x1,y1,z1`).
 
 On startup the wrapper prints `Press Q to stop`. If `-s` is provided the
-resulting file begins with the header `time,x,y,z` and contains raw numeric
-rows. Without `-s` each line on the console is formatted like
-`time = 0.100, x = 0.123, y = 0.456, z = 0.789`. When saving to a file the
-banner and a short summary remain on the console.
+resulting file begins with `time,x,y,z` unless `--dual` is used, in which case
+the full dual header is written. Without `-s` each line on the console is
+formatted like `time = 0.100, x = 0.123, y = 0.456, z = 0.789`. Use `--dual` to
+show both sensors in this human readable mode. When saving to a file the banner
+and a short summary remain on the console.
 
 ## Using the simulator
 
 The repository ships with a simulator for development without hardware. Start it
-and point the wrapper to the shown pseudo‑terminal:
+and point the wrapper to the shown pseudo‑terminal. Pass `--dual` to the
+simulator to mimic firmware built with `DUAL_SPI`:
 
 ```bash
-./simulator.py
+./simulator.py        # single output
+./simulator.py --dual # dual output
 ./adxl345usb -p /dev/pts/5 -t 1
 ```
 

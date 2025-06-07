@@ -15,7 +15,9 @@ It sends a text command `F=<Hz>` to the device to select the sample rate
 without `-s` the wrapper converts each CSV line from the firmware into a human
 friendly message such as `time = 0.100, x = 0.123, y = 0.456, z = 0.789`.
 With `-s` the header `time,x,y,z` and all raw values are written to the chosen
-file while only the banner and a short summary appear on the console.
+file while only the banner and a short summary appear on the console. When the
+firmware outputs data for two sensors the wrapper selects one set of axes using
+the `--sensor` option. To store or display all six axes, pass `--dual`.
 
 Example wrapper output:
 
@@ -27,10 +29,10 @@ time = 0.020, x = -0.611, y = 0.728, z = -0.441
 
 ## Firmware (`src/main.cpp`)
 
-The firmware is written for the Arduino‑mbed RP2040 core. It sets up the ADXL345 over SPI and then streams acceleration samples as `time,x,y,z` lines. A simple text command interface allows changing the sample rate at runtime with `F=<Hz>`.
-Every time the frequency changes the firmware resends the header `time,x,y,z`
+The firmware is written for the Arduino‑mbed RP2040 core. It sets up the ADXL345 over SPI and then streams acceleration samples as `time,x,y,z` lines. A simple text command interface allows changing the sample rate at runtime with `F=<Hz>`. When compiled with `DUAL_SPI` the output header becomes `time,x0,y0,z0,x1,y1,z1`.
+Every time the frequency changes the firmware resends the appropriate header
 followed by the data rows. Each row starts with the elapsed time in seconds and
-then lists the X, Y and Z axes in units of `g`.
+then lists the accelerometer axes in units of `g`.
 
 Example device output:
 
@@ -42,7 +44,7 @@ time,x,y,z
 
 ## Simulator (`simulator.py`)
 
-For development without hardware, a simulator is provided. It creates a pseudo‑terminal that mimics the firmware's behaviour so the wrapper and plugin can be tested locally. The tests use this simulator to validate the wrapper.
+For development without hardware, a simulator is provided. It creates a pseudo‑terminal that mimics the firmware's behaviour so the wrapper and plugin can be tested locally. Add `--dual` when running it to emit the dual‑sensor format. The tests use this simulator to validate the wrapper.
 
 ## Tests
 
