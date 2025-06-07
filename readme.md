@@ -4,7 +4,7 @@
 
 This project provides an installation script and firmware for using a RP2040 based ADXL345 sensor module with [OctoPrint-Pinput\_Shaping](https://github.com/navaismo/Octoprint-Pinput_Shaping) by navaismo.
 
-See the [docs](docs/) directory for detailed guides on setup, usage, development and the code itself.
+See the [docs](docs/) directory for detailed guides on setup, usage, development and the code itself. SPI pinouts for the supported boards are listed in [docs/spi-ports.md](docs/spi-ports.md).
 
 ## Features
 
