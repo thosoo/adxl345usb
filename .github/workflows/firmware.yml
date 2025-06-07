@@ -19,6 +19,9 @@ jobs:
           - fysetc_pis
           - btt_adxl345
           - kusba_v2
+          - generic_rp2040_spi0
+          - generic_rp2040_spi1
+          - generic_rp2040_dual
 
     steps:
     # ── Checkout code ────────────────────────────────────────────────
