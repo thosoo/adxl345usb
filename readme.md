@@ -36,6 +36,15 @@ This project provides an installation script and firmware for using a RP2040 bas
 
 The firmware running on the RP2040 should be the `adxl345usb` firmware provided in this project. The firmware can be either compiled using VS Code and PlatformIO or downloaded from the GitHub action tab. It outputs CSV-formatted accelerometer data directly over USB (same format as `adxl345spi`).
 
+## Simulator
+
+A simple simulator (`simulator.py`) is included for experimenting with the wrapper without any hardware attached. Run the simulator and point the wrapper to the printed pseudo-serial device:
+
+```bash
+./simulator.py
+./adxl345usb -p /dev/pts/5
+```
+
 ## Troubleshooting
 
 * If you receive a "Permission Denied" error, ensure that the OctoPrint user has execute permissions on the tool:
