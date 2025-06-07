@@ -11,12 +11,19 @@ also compatible with OctoPrint's Pinput Shaping plugin which expects the
 `adxl345spi` style output.
 
 It sends a text command `F=<Hz>` to the device to select the sample rate
-(default `250` Hz) and prints a banner `Press Q to stop` followed by the CSV
-header `time,x,y,z`. Each row contains a timestamp in seconds and the three
-acceleration axes. When running without `-s` the wrapper converts these values
-into a human friendly format such as `time = 0.100, x = 0.123, y = 0.456, z =
-0.789`. When `-s` is specified the raw CSV lines are written to the given file
-while the banner and a short summary stay on the console.
+(default `250` Hz) and then prints the banner `Press Q to stop`. When running
+without `-s` the wrapper converts each CSV line from the firmware into a human
+friendly message such as `time = 0.100, x = 0.123, y = 0.456, z = 0.789`.
+With `-s` the header `time,x,y,z` and all raw values are written to the chosen
+file while only the banner and a short summary appear on the console.
+
+Example wrapper output:
+
+```text
+Press Q to stop
+time = 0.010, x = 0.786, y = -0.904, z = 0.174
+time = 0.020, x = -0.611, y = 0.728, z = -0.441
+```
 
 ## Firmware (`src/main.cpp`)
 
@@ -24,6 +31,14 @@ The firmware is written for the Arduino‑mbed RP2040 core. It sets up the ADXL3
 Every time the frequency changes the firmware resends the header `time,x,y,z`
 followed by the data rows. Each row starts with the elapsed time in seconds and
 then lists the X, Y and Z axes in units of `g`.
+
+Example device output:
+
+```text
+time,x,y,z
+0.010000,0.786000,-0.904000,0.174000
+0.020000,-0.611000,0.728000,-0.441000
+```
 
 ## Simulator (`simulator.py`)
 
