@@ -63,11 +63,11 @@
 
 /* SPI instance(s) on the chosen GPIOs */
 #ifdef DUAL_SPI
-static mbed::SPI spi0(
+static mbed::SPI mbedSpi0(
     digitalPinToPinName(MOSI0_PIN),
     digitalPinToPinName(MISO0_PIN),
     digitalPinToPinName(SCK0_PIN));
-static mbed::SPI spi1(
+static mbed::SPI mbedSpi1(
     digitalPinToPinName(MOSI1_PIN),
     digitalPinToPinName(MISO1_PIN),
     digitalPinToPinName(SCK1_PIN));
@@ -183,8 +183,8 @@ void setup() {
     while (!Serial) { }
 
 #ifdef DUAL_SPI
-    setupADXL(spi0, CS0_PIN);
-    setupADXL(spi1, CS1_PIN);
+    setupADXL(mbedSpi0, CS0_PIN);
+    setupADXL(mbedSpi1, CS1_PIN);
     t0_us = micros();
     Serial.println("time,x0,y0,z0,x1,y1,z1");
 #else
@@ -211,8 +211,8 @@ void loop() {
 
 #ifdef DUAL_SPI
         uint8_t raw0[6], raw1[6];
-        adxlReadBurst(spi0, CS0_PIN, REG_DATAX0, raw0, 6);
-        adxlReadBurst(spi1, CS1_PIN, REG_DATAX0, raw1, 6);
+        adxlReadBurst(mbedSpi0, CS0_PIN, REG_DATAX0, raw0, 6);
+        adxlReadBurst(mbedSpi1, CS1_PIN, REG_DATAX0, raw1, 6);
 
         int16_t rx0 = (raw0[1] << 8) | raw0[0];
         int16_t ry0 = (raw0[3] << 8) | raw0[2];
