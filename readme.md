@@ -44,7 +44,18 @@ A simple simulator (`simulator.py`) is included for experimenting with the wrapp
 
 ```bash
 ./simulator.py
-./adxl345usb -p /dev/pts/5
+  ./adxl345usb -p /dev/pts/5
+```
+
+## Testing
+
+Python tests verify the wrapper and simulator, while PlatformIO builds run
+GoogleTest-based firmware tests. Install the dependencies and run:
+
+```bash
+pip install pyserial pytest platformio
+pytest -q
+pio test -e native -e native_dual
 ```
 
 ## Troubleshooting

@@ -8,11 +8,21 @@ flash it directly when your board is connected.
 
 ## Running the tests
 
-Install the dependencies and run `pytest`:
+Install the dependencies and run the Python tests with `pytest`:
 
 ```bash
 pip install pyserial pytest
 pytest -q
 ```
 
-The test suite exercises the wrapper and the simulator.
+The Python test suite exercises the wrapper and the simulator.
+
+### Firmware unit tests
+
+The firmware can be tested on the host using PlatformIO and GoogleTest. Install
+PlatformIO alongside the Python dependencies and run:
+
+```bash
+pip install platformio
+pio test -e native -e native_dual
+```
