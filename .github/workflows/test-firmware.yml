@@ -1,0 +1,23 @@
+name: CI – firmware unit tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyserial pytest platformio
+    - name: Run PlatformIO tests
+      run: pio test -e native -e native_dual

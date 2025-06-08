@@ -49,3 +49,5 @@ For development without hardware, a simulator is provided. It creates a pseudoâ€
 ## Tests
 
 The `tests` directory contains a minimal Pytest suite exercising both the wrapper and the simulator. Running `pytest` ensures that the wrapper behaves correctly even when PySerial is missing and that it can talk to the simulator.
+
+Firmware sources are also tested using GoogleTest via PlatformIO. The `native` and `native_dual` environments build the firmware for the host, enabling single- and dual-sensor tests respectively. Run `pio test -e native -e native_dual` to execute them.
